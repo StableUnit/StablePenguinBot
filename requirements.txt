@@ -1,0 +1,4 @@
+emoji>=0.5.1
+first>=2.0.1
+pyTelegramBotAPI>=3.6.6
+requests>=2.19.1
