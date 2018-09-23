@@ -26,8 +26,6 @@ def normalize_message(message):
         u'\U0001F1E0-\U0001F1FF'
     ']+', flags=re.UNICODE)
 
-    # print(message.text)
-    
     # Strips the message in chunks: from entity to entity
     for entity in message.entities:
         # Keeps track of how many emojis are in the message
@@ -67,11 +65,11 @@ def normalize_message(message):
         elif entity.type == 'italic':
             # Detects an italicized text
             entity_normalized = '_{}_'.format(entity_text)
-        elif entity.type == 'pre':
-            # Detects a prettified text
-            entity_normalized = '`{}`'.format(entity_text)
         elif entity.type == 'code':
             # Detects a coded text
+            entity_normalized = '`{}`'.format(entity_text)
+        elif entity.type == 'pre':
+            # Detects a prettified text
             entity_normalized = '```{}```'.format(entity_text)
         else:
             # Detects other entities
@@ -79,8 +77,6 @@ def normalize_message(message):
                         'Adding as text'.format(entity.type, entity.offset, entity.length))
             entity_normalized = entity_text
 
-        # print(offsets, lengths, emoji_shift)
-        
         # Adds the stripped chunk to the final string
         normalized += message.text[offsets[-2] + lengths[-2]:offsets[-1]] + entity_normalized
 
