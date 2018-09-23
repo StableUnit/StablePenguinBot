@@ -2,7 +2,7 @@
 
 Link pre-moderation bot for StableUnit telegram chat
 
-Runs on Python 3.5, install all dependencies by executing:
+Runs on Python 3.5 and up. Install all dependencies by executing:
 ```sh
 pip3 install -r requirements.txt
 ```
@@ -28,6 +28,7 @@ and restart bash
 * If a user joins this chat for the first time, the bot greets him/her and suggests to follow the rules
 * If a user comes back to the chat, the bots welcomes him/her back
 * If a user posts message with a link for the first time, the bot blocks it and sends to chat's admins for pre-moderation.
+
 _Please note, that the bot must have admin rights in order to function properly._
 
 ### Admins can
