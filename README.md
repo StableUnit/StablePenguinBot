@@ -39,13 +39,14 @@ _Please note, that the bot must have admin rights in order to function properly.
 
 ### List of commands
 * `/start`: outputs id of a current chat
+* `/get_admins`: outputs the information about a current chat\'s and bot\'s administrators and updates it to the database (should be called after the setup)
 * `/wl_add` \* (in reply to a user\'s message): adds the user to the whitelist
 * `/wl_del` \* (in reply to a user\'s message): removes the user from the whitelist, so his future links will require pre-moderation
 * `/bl_add` \* (in reply to a user\'s message): adds the user to the blacklist
 * `/bl_del` \* (in reply to a user\'s message): removes the user from the blacklist, so his future links will require pre-moderation
 * `/uid` \* (in reply to user\'s message): outputs the user\'s Telegram id number
 * `/db_stat` \*: outputs the current state of a database of chat members, whitelisted and blacklisted members
-* `/db_flush 'parameter` \*: flushes any of the database\'s storages (`'members'/'admins'/'whitelist'/'blacklist'`) or the entire database (`'all'`)
+* `/db_flush 'parameter'` \*: flushes any of the database\'s storages (`'members'/'admins'/'whitelist'/'blacklist'`) or the entire database (`'all'`)
 * `/kek`: outputs text and other memes
 * `/kek_add` \* (in reply to a user\'s message): adds user\'s message (if it\'s a text, a sticker, a photo, an audio or a voice file) to list of available keks
 * `/help`: outputs help.

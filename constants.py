@@ -38,6 +38,7 @@ help_text = '<b>List of features of this bot:</b>\n'\
             '  • permanently ban the user.\n\n'\
             '<b>List of commands:</b>\n'\
             '/start: outputs id of a current chat.\n'\
+            '/get_admins: outputs the information about a current chat\'s and bot\'s administrators and updates it to the database.\n'\
             '/wl_add * (in reply to a user\'s message): adds the user to the whitelist.\n'\
             '/wl_del * (in reply to a user\'s message): removes the user from the whitelist, so his future links will require pre-moderation.\n'\
             '/bl_add * (in reply to a user\'s message): adds the user to the blacklist.\n'\
