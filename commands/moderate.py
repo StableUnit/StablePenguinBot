@@ -87,10 +87,7 @@ def normalize_message(message):
 
 # Forwards a judged user's message to every admin from admins list
 # for pre-moderation.  Sends the according calls to the callback query handler
-def require_approval(message, admins):
-    user_text = ''
-    user_data = ''
-    msg_id = message.message_id
+def require_approval(message, require_text, admins, too_long=False):
     admins_failed_contact = []
 
     # Tries to delete the original message from the main chat
@@ -106,10 +103,6 @@ def require_approval(message, admins):
         else:
             print(e.result)
             logger.exception('ApiException.')
-
-    # Strips the judged message and get data about the judged user
-    user_text = normalize_message(message)
-    user_data = get_user(message.from_user)
 
     # Initializes the main judgment keyboard
     keyboard = types.InlineKeyboardMarkup(row_width=2)
@@ -128,17 +121,8 @@ def require_approval(message, admins):
     button_no_backup = types.InlineKeyboardButton(text='🚫 No', callback_data='no_huge')
     keyboard_backup.add(button_yes_backup, button_no_backup)
 
-    # Initializes the judgment message and keyboard (default is standard)
-    require_text = 'User {0} posted a link in the following message ({2}):\n\n{1}'\
-                   '\n\nShould I approve it?'.format(user_data, user_text, msg_id)
-    kb = keyboard
-
-    # If the judgment message turns out to be too large to fit in one message
-    # (i.e. the judgment message contains more than 4096 symbols)
-    # fallbacks to the backup keyboard 
-    if len(require_text) > 4096:
-        require_text = message.text
-        kb = keyboard_backup
+    # Initializes the judgment keyboard
+    kb = keyboard_backup if too_long else keyboard
 
     # Tries to deliver the judgment message to all admins
     for admin in admins:

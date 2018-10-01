@@ -50,7 +50,7 @@ def help_msg(message):
 
 # Handler for /get_admins
 # Gathers the information about a current chat's administrators and saves it to the database
-# Must be called in a supergroup chay
+# Must be called in a supergroup chat
 @bot.message_handler(commands=['get_admins'])
 def get_my_admins(message):
     if not validate_command(message, check_private=True):
@@ -139,6 +139,9 @@ def stat_msg(message):
     # NOTE that there can be up to 4096 symbols in a single Telegram message,
     # so a cut on 700 symbols is done purely for the cosmetic purposes
     if len(db_statistics) > 700:
+        # If gen/ doesn't exist
+        if not os.path.exists(config.gen_dir):
+            os.mkdir(config.gen_dir)
         with open('{}db.txt'.format(config.gen_dir), 'w') as f:
             f.write(db_statistics)
         bot.send_document(message.chat.id, open('{}db.txt'.format(config.gen_dir), 'rb'),\
@@ -211,6 +214,8 @@ def kekadd_msg(message):
 def analyze_msg(message):
     entity_type = ''
     admins_failed_contact = []
+    pending_msg_id = 0
+    too_long = False
 
     if message.chat.type == 'private':
         return
@@ -264,8 +269,24 @@ def analyze_msg(message):
             if entity.type in ['url', 'text_link']:
                 logger.info('Alert! User {0} has posted a message that contains a {1}.\n'\
                             'Triggering admins...'.format(get_user(message.from_user), entity.type))
-                data['msg_ids_pending'].append(message.message_id)
-                moderate.require_approval(message, data['admins'])
+
+                # Initializes the judgment message
+                user_data = get_user(message.from_user)
+                user_text = moderate.normalize_message(message)
+                require_text = 'User {0} posted a link in the following message ({2}):\n\n{1}'\
+                   '\n\nShould I approve it?'.format(user_data, user_text, message.message_id)
+
+                # If the judgment message turns out to be too large to fit in one message
+                # (i.e. the judgment message contains more than 4096 symbols)
+                # fallbacks to the original message as is and flags 'too_long' for a backup keyboard 
+                if len(require_text) > 4096:
+                    require_text = message.text
+                    pending_msg_id = message.text
+                    too_long = True
+                else:
+                    pending_msg_id = message.message_id
+                data['msg_ids_pending'].append(pending_msg_id)
+                moderate.require_approval(message, require_text, data['admins'], too_long)
                 break
 
 
@@ -275,12 +296,16 @@ def analyze_msg(message):
 def callback_inline(call):
     approved_msg = ''
     # The judged user's ID is the second word of the judging message (call.message)
-    user_id = int(call.message.text.split(' ')[1])
-    # The judged message's ID is in parentheses right before a line-break. 
-    user_msg_id = int(call.message.text.split(' message (')[1].split('\n')[0][:-2])
+    # Case of a huge judged messages: 0 since it will not be used
+    user_id = int(call.message.text.split(' ')[1]) if call.data not in ['yes_huge', 'no_huge'] else 0
+    # The judged message's ID is in parentheses right before a line-break 
+    # Similarly to above: in case of a huge judged message just go with 0
+    user_msg_id = int(call.message.text.split(' message (')[1].split('\n')[0][:-2]) if\
+                    call.data not in ['yes_huge', 'no_huge'] else 0
     # Gets full information about the judged user
     # If there's a username included, mention_replace() rewrites it in the Markdown-friendly format
-    user_data_db = ' '.join(call.message.text.split(' posted a link')[0].split(' ')[2:])
+    user_data_db = ' '.join(call.message.text.split(' posted a link')[0].split(' ')[2:]) if\
+                            call.data not in ['yes_huge', 'no_huge'] else ''
     if '@' in user_data_db.split(' ')[-1]:
         user_data = user_data_db.replace(user_data_db.split(' ')[-1], '({})'.format(\
             mention_replace(int(call.message.text.split(' ')[1]), user_data_db.split(' ')[-1])))
@@ -398,19 +423,19 @@ def callback_inline(call):
 
         # Two special cases for large messages
         elif call.data == 'yes_huge':
-            if user_msg_id not in data['msg_ids_pending']:
+            if call.message.text not in data['msg_ids_pending']:
                 bot.reply_to(call.message, 'This message has been already dealt with.')
                 return
-            data['msg_ids_pending'].remove(user_msg_id)
+            data['msg_ids_pending'].remove(call.message.text)
             bot.send_message(config.chat_id, call.message.text)
             bot.reply_to(call.message, 'This huge message has been approved.')
             logger.info('Ridiculously huge message has been approved by admin {}'.format(data['admins'][call.message.chat.id]))
 
         elif call.data == 'no_huge':
-            if user_msg_id not in data['msg_ids_pending']:
+            if call.message.text not in data['msg_ids_pending']:
                 bot.reply_to(call.message, 'This message has been already dealt with.')
                 return
-            data['msg_ids_pending'].remove(user_msg_id)
+            data['msg_ids_pending'].remove(call.message.text)
             bot.reply_to(call.message, 'This huge message has been declined.')
             logger.info('Ridiculously huge message has been declined by admin {}'.format(data['admins'][call.message.chat.id]))
 
