@@ -21,8 +21,8 @@ welcomeback_list = [
     'We missed you'
 ]
 
-start_text = 'This is a test of moderation bot for @elpinguinofrio.\n'\
-                'ID of this chat: {} (copy/paste it to config file).\n\n'\
+start_text = 'This is a link pre-moderation bot for @StableUnit.\n'\
+                'ID of this chat: {}.\n\n'\
                 'Please run /get_admins to get/update a list of this chat\'s admins.\n'\
                 'For commands\' usage see /help.'
 
