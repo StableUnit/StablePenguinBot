@@ -40,12 +40,17 @@ def mention_replace(user_id, username):
 
 # Returns data from a dict in
 # `key: value` format  OR  `key: value[0] [value[1]]` format if value is a list of length 2
-def print_dict(dic):
+# NOTE: on recent systems a shelve'd database can not be opened twice
+def print_dict(dic, data=None):
     printed = ''
-    with shelve.open(config.data_name, 'c', writeback=True) as data:
+
+    if data:
         data['admins'] = config.admins_default if not data.get('admins') else data['admins']
         for k, v in dic.items():
             printed += '{0}: {1} [added by {2}]\n'.format(k, v[0], data['admins'][v[1]]) if type(v) == list else '{0}: {1}\n'.format(k, v)
+    else:
+        for k, v in dic.items():
+            printed += '{0}: {1}\n'.format(k, v)
     return printed
 
 

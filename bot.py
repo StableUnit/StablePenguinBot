@@ -132,7 +132,7 @@ def stat_msg(message):
         data['blacklist'] = {} if not data.get('blacklist') else data['blacklist']
 
         db_statistics = 'Members:\n{0}\nAdmins:\n{3}\nWhitelist:\n{1}\nBlacklist:\n{2}'.format(print_dict(data['members']),\
-                                print_dict(data['whitelist']), print_dict(data['blacklist']), print_dict(data['admins']))
+                                print_dict(data['whitelist'], data), print_dict(data['blacklist'], data), print_dict(data['admins'], data))
 
     # If the stat is too long for reading as a Telegram message
     # writes it to gen/db.txt and sends it as a file
