@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-import re
-
-import emoji
 from telebot import types
 from telebot.apihelper import ApiException
 
@@ -17,42 +14,28 @@ def normalize_message(message):
     entity_normalized = ''
     offsets = [0]
     lengths = [0]
-    emoji_shift = 0
-    emojis_ajasoned = ''
-    emoji_pattern = re.compile('['
-        u'\U0001F600-\U0001F64F'
-        u'\U0001F300-\U0001F5FF'
-        u'\U0001F680-\U0001F6FF'
-        u'\U0001F1E0-\U0001F1FF'
-    ']+', flags=re.UNICODE)
+
+    # Encodes the judged message to preserve possible emojis
+    msg_enc = message.text.encode('utf-16le')
 
     # Strips the message in chunks: from entity to entity
     for entity in message.entities:
-        # Keeps track of how many emojis are in the message
-        emoji_shift += len(''.join(c for c in message.text[offsets[-1]:entity.offset] if c in emoji.UNICODE_EMOJI))
-        
         # Keeps track of the entities position in the message 
-        offsets.append(entity.offset - emoji_shift)
+        offsets.append(entity.offset)
         lengths.append(entity.length)
 
-        entity_text = message.text[offsets[-1]:offsets[-1]+lengths[-1]]
+        # Decodes a chunk of the message to get contents of an entity
+        # NOTE that in the encoded message every symbols comes with a pair, hence doubling the indices
+        entity_text = msg_enc[2*offsets[-1]:2*(offsets[-1]+lengths[-1])].decode('utf-16le')
 
         # Strips the found link and other entities
         # rewrites it in the Markdown-friendly format 
         if entity.type == 'text_link':
             # Detects a hidden link
-            emojis_ajasoned_pattern = re.match(emoji_pattern, entity_text)
-            if emojis_ajasoned_pattern:
-                emojis_ajasoned = emojis_ajasoned_pattern.group(1)
-            entity_normalized = '{2}[{1}]({0})'.format(entity.url, emoji_pattern.sub(r'', entity_text),\
-                                                       emojis_ajasoned)
+            entity_normalized = '[{1}]({0})'.format(entity.url, entity_text)
         elif entity.type == 'url':
             # Detects an ordinary link
-            emojis_ajasoned_pattern = re.match(emoji_pattern, entity_text)
-            if emojis_ajasoned_pattern:
-                emojis_ajasoned = emojis_ajasoned_pattern.group(1)
-            entity_normalized = '{1}[{0}]({0})'.format(emoji_pattern.sub(r'', entity_text),\
-                                                       emojis_ajasoned)
+            entity_normalized = '[{0}]({0})'.format(entity_text)
         elif entity.type == 'email':
             # Detects an email
             entity_normalized = '[{0}](mailto:{0})'.format(entity_text)
@@ -78,10 +61,10 @@ def normalize_message(message):
             entity_normalized = entity_text
 
         # Adds the stripped chunk to the final string
-        normalized += message.text[offsets[-2] + lengths[-2]:offsets[-1]] + entity_normalized
+        normalized += msg_enc[2*(offsets[-2]+lengths[-2]):2*offsets[-1]].decode('utf-16le') + entity_normalized
 
     # Adds the part after the last entity
-    normalized += message.text[offsets[-1] + lengths[-1]:]
+    normalized += msg_enc[2*(offsets[-1]+lengths[-1]):].decode('utf-16le')
     return normalized
 
 
