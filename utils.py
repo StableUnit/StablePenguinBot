@@ -75,7 +75,8 @@ def command_with_delay(delay=10):
 
 
 # Checks whether a command was called properly
-def validate_command(message, check_private=False, check_chat=False, check_length=False, check_rights=False, check_reply=False):
+def validate_command(message, check_private=False, check_chat=False, check_length=False, check_rights=False, check_reply=False,\
+                        check_forward=False):
     if check_private and message.chat.type == 'private':
         logger.info('User {0} called {1} in a private chat. Aborting'.format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
@@ -99,7 +100,12 @@ def validate_command(message, check_private=False, check_chat=False, check_lengt
     if check_reply and getattr(message, 'reply_to_message') is None:
         bot.reply_to(message, constants.man['{}'.format(message.text.split(' ')[0][1:])], parse_mode='Markdown')
         logger.info('Admin {0} called {1} the wrong way'.format(get_user(message.from_user), message.text.split(' ')[0]))
-        return False 
+        return False
+    elif check_reply:
+        if check_forward and getattr(message.reply_to_message, 'forward_from') is None:
+            bot.reply_to(message, constants.man['{}'.format(message.text.split(' ')[0][1:])], parse_mode='Markdown')
+            logger.info('Admin {0} called {1} the wrong way'.format(get_user(message.from_user), message.text.split(' ')[0]))
+            return False
 
     return True
 

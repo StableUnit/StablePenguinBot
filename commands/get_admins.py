@@ -8,7 +8,7 @@ from utils import bot, print_dict
 # Executes /get_admins
 def get_admins(message):
     # Gets all human administrators of a chat
-    admins_objects = [admin for admin in bot.get_chat_administrators(message.chat.id) if not admin.user.is_bot]
+    admins_objects = [admin for admin in bot.get_chat_administrators(config.chat_id) if not admin.user.is_bot]
     # Gets every administrator's id, appends the default admins' ids
     admins_ids = [ad.user.id for ad in admins_objects] + [*config.admins_default]
 

@@ -56,15 +56,23 @@ db_storages = ['members', 'admins', 'whitelist', 'blacklist', 'all']
 
 man = {'wl_add': '`Usage of /wl_add:`\n'\
                     '`    /wl_add  in response to a user\'s message`\n'\
+                    '`or in case of using in the bot\'s PM:`\n'\
+                    '`    /wl_add  in response to a forwarded user\'s message`\n'\
                     '`Adds the user to the whitelist.`',
         'wl_del': '`Usage of /wl_del:`\n'\
                     '`    /wl_del  in response to a user\'s message`\n'\
+                    '`or in case of using in the bot\'s PM:`\n'\
+                    '`    /wl_del  in response to a forwarded user\'s message`\n'\
                     '`Removes the user from the whitelist.`',
         'bl_add': '`Usage of /bl_add:`\n'\
                     '`    /bl_add  in response to a user\'s message`\n'\
+                    '`or in case of using in the bot\'s PM:`\n'\
+                    '`    /bl_add  in response to a forwarded user\'s message`\n'\
                     '`Adds the user to the blacklist.`',
         'bl_del': '`Usage of /bl_del:`\n'\
                     '`    /bl_del  in response to a user\'s message`\n'\
+                    '`or in case of using in the bot\'s PM:`\n'\
+                    '`    /bl_del  in response to a forwarded user\'s message`\n'\
                     '`Removes the user from the blacklist.`',
         'db_flush': '`Usage of /db_flush:`\n'\
                     '`    /db_flush <parameter>`\n'\
@@ -75,4 +83,6 @@ man = {'wl_add': '`Usage of /wl_add:`\n'\
                     '`Outputs the user\'s unique Telegram ID number.`',
         'kek_add': '`Usage of /kek_add:`\n'\
                     '`    /kek_add  in response to a user\'s message containing new kek`\n'\
+                    '`or in case of using in the bot\'s PM:`\n'\
+                    '`    /kek_add  in response to a forwarded user\'s message`\n'\
                     '`Adds user\'s text to kek_texts file, adds user\'s sticker/photo/audio/voice file to kek_ids file.`'}

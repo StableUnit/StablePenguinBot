@@ -53,9 +53,6 @@ def help_msg(message):
 # Must be called in a supergroup chat
 @bot.message_handler(commands=['get_admins'])
 def get_my_admins(message):
-    if not validate_command(message, check_private=True):
-        return
-
     get_admins.get_admins(message)
     logger.info('User {} called /get_admins'.format(get_user(message.from_user)))
 
@@ -65,10 +62,12 @@ def get_my_admins(message):
 # Admins only; must be called as a reply
 @bot.message_handler(commands=['wl_add'])
 def wl_user(message):
-    if not validate_command(message, check_rights=True, check_reply=True):
+    private_mode = False if message.chat.id == config.chat_id else True
+
+    if not validate_command(message, check_rights=True, check_reply=True, check_forward=private_mode):
         return
 
-    lists_manager.wl_add(message)
+    lists_manager.wl_add(message, is_forward=private_mode)
 
 
 # Handler for /wl_del
@@ -76,10 +75,12 @@ def wl_user(message):
 # Admins only; must be called as a reply
 @bot.message_handler(commands=['wl_del'])
 def uwl_user(message):
-    if not validate_command(message, check_rights=True, check_reply=True):
+    private_mode = False if message.chat.id == config.chat_id else True
+
+    if not validate_command(message, check_rights=True, check_reply=True, check_forward=private_mode):
         return
 
-    lists_manager.wl_del(message)
+    lists_manager.wl_del(message, is_forward=private_mode)
 
 
 # Handler for /bl_add
@@ -87,10 +88,12 @@ def uwl_user(message):
 # Admins only; must be called as a reply
 @bot.message_handler(commands=['bl_add'])
 def bl_user(message):
-    if not validate_command(message, check_rights=True, check_reply=True):
+    private_mode = False if message.chat.id == config.chat_id else True
+
+    if not validate_command(message, check_rights=True, check_reply=True, check_forward=private_mode):
         return
 
-    lists_manager.bl_add(message)
+    lists_manager.bl_add(message, is_forward=private_mode)
 
 
 # Handler for /bl_del
@@ -98,10 +101,11 @@ def bl_user(message):
 # Admins only; must be called as a reply
 @bot.message_handler(commands=['bl_del'])
 def ubl_user(message):
-    if not validate_command(message, check_rights=True, check_reply=True):
+    private_mode = False if message.chat.id == config.chat_id else True
+    if not validate_command(message, check_rights=True, check_reply=True, check_forward=private_mode):
         return
 
-    lists_manager.bl_del(message)
+    lists_manager.bl_del(message, is_forward=private_mode)
 
 
 # Handler fot /uid
@@ -202,7 +206,8 @@ def kek_msg(message):
 # Admins only; must be called as a reply
 @bot.message_handler(commands=['kek_add'])
 def kekadd_msg(message):
-    if not validate_command(message, check_rights=True, check_reply=True):
+    private_mode = False if message.chat.id == config.chat_id else True
+    if not validate_command(message, check_rights=True, check_reply=True, check_forward=private_mode):
         return
 
     kek.kek_add(message.reply_to_message)
