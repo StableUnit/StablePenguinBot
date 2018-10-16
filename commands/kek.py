@@ -55,8 +55,7 @@ def kek_add(message):
             if getattr(message, 'text'):
                 add_text = message.text
                 kek_text.write('\n'+add_text)
-
-            if getattr(message, 'sticker'):
+            elif getattr(message, 'sticker'):
                 add_id = '<sticker>{}'.format(message.sticker.file_id)
             elif getattr(message, 'audio'):
                 add_id = '<audio>{}'.format(message.audio.file_id)
@@ -64,7 +63,8 @@ def kek_add(message):
                 add_id = '<voice>{}'.format(message.voice.file_id)
             elif getattr(message, 'photo'):
                 add_id = '<photo>{}'.format(message.photo[0].file_id)
-            else:
+            
+            if not(add_text or add_id):
                 bot.reply_to(message, 'Sorry, couldn\'t add your kek. Only text, photos, stickers, audio and voice files '\
                                       'are supported by now.')
                 logger.info('Couldn\'t add a kek')
